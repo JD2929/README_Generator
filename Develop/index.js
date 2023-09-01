@@ -2,8 +2,9 @@
 //installed "inquirer"
 
 const inquirer = require('inquirer');
-const { writeFile } = require('fs').promises;
-
+const fs = require('fs');
+const path = require('path');
+const generateMarkdown = require('./utils/generateMarkdown')
 
 // TODO: Create an array of questions for user input
 
@@ -31,11 +32,17 @@ const promptUser = () => {
             name: 'usage',
             message: 'What usage information does the user require to use your project?',
         },
+{
+    type:'list',
+    name: 'license',
+    message: 'Which license is your project under?',
+    choices: ["MIT", "GNU", "ISC", "Apache2.0", "None"]
 
+},
         {
             type: 'input',
             name: 'contribution',
-            message: 'Please enter any contributions guidelines you wish to include in the README for your project.',
+            message: 'Please enter any contribution guidelines you wish to include in the README for your project.',
         },
 
         {
@@ -43,52 +50,30 @@ const promptUser = () => {
             name: 'testing',
             message: 'What are the test instructions for your project?'
         },
-
+        {
+            type: 'input',
+            name: 'email',
+            message: 'What is your email address?'
+        },
+        {
+            type: 'input',
+            name: 'github',
+            message: 'What is your GitHub username?'
+        }, 
     ]);
 };
 
 
 // TODO: Create a function to write README file
-const generateReadMe = ({ title, description, installation, usage, contributions, testing }) => {
-
-    `# ${title} 
-
-    ## Description 
-    
-    ${description} 
-
-    ## Table of Contents
-
-        ### Installtion Instructions
-        ### How to best use ${title}
-        ### Contributions
-        ### Testing Instructions
-    
-    ## Installation Instructions 
-    
-    ${installation}
-    
-    ## How to best use ${title} 
-    
-    ${usage} 
-    
-    ## Contributions 
-    
-    ${contributions} 
-    
-    ## Testing Instructions 
-    
-    ${testing}`
-
-   
-};
-
+function writeToFile (fileName,data) {
+    fs.writeFileSync(path.join(fileName),data)
+}
  // TODO: Create a function to initialize app
  const init = () => {
     promptUser()
-        .then((answers) => writeFile('README.md', generateReadMe(answers)))
+        .then((answers) => writeToFile('README.md', generateMarkdown({...answers})))
         .then(() => console.log('Successfully wrote to README.md'))
-        .cath((err) => console.error(err));
+        .catch((err) => console.error(err));
 };
 
 // Function call to initialize app
